@@ -47,10 +47,43 @@ class Bd {
             if(despesa === null) {
                 continue
             }
-
+            despesa.id = i 
             despesas.push(despesa)
         }
         return despesas
+    }
+
+    pesquisar(despesa) {
+        let despesasFiltradas = Array()
+        despesasFiltradas = this.recuperarTodosRegistros()
+
+        //filtros
+        //ano
+        if(despesa.ano != '') {
+            despesasFiltradas = despesasFiltradas.filter(valor => valor.ano == despesa.ano)
+        }
+        //mes
+        if(despesa.mes != '') {
+            despesasFiltradas = despesasFiltradas.filter(valor => valor.mes == despesa.mes)
+        }
+        //dia
+        if(despesa.dia != '') {
+            despesasFiltradas = despesasFiltradas.filter(valor => valor.dia == despesa.dia)
+        }
+        //descricao
+        if(despesa.descricao != '') {
+            despesasFiltradas = despesasFiltradas.filter(valor => valor.descricao == despesa.descricao)
+        }
+        //valor
+        if(despesa.valor != '') {
+            despesasFiltradas = despesasFiltradas.filter(valor => valor.valor == despesa.valor)
+        }
+
+        return despesasFiltradas
+    }
+
+    remover(id) {
+        localStorage.removeItem(id)
     }
 }
 
@@ -90,9 +123,12 @@ function ajustarModal(sucesso) {
     document.getElementById('modal_btn').className = (sucesso===true?'btn btn-success':'btn btn-danger')
 }
 
-function carregaListaDespesas() {
-    let despesas = bd.recuperarTodosRegistros()
+function carregaListaDespesas(despesas = Array(), filtro = false) {
+    if (despesas.length == 0 && filtro == false) {
+        despesas = bd.recuperarTodosRegistros()
+    }
     let listaDespesas = document.getElementById('listaDespesas')
+    listaDespesas.innerHTML = ''
     /*Base
     <tr>
         <td>15/03/2018</td>
@@ -101,8 +137,7 @@ function carregaListaDespesas() {
         <td>R$200,00</td>
     </tr>*/
 
-    despesas.forEach(function(valor, indice, lista) {
-        console.log(valor)
+    despesas.forEach(function(valor) {
         //criando o TR
         let linha = listaDespesas.insertRow()
 
@@ -125,6 +160,33 @@ function carregaListaDespesas() {
         linha.insertCell(1).innerHTML = valor.tipo
         linha.insertCell(2).innerHTML = valor.descricao
         linha.insertCell(3).innerHTML = valor.valor
-        linha.insertCell(4)
+        // Criar o botão de exclusão
+        let btn = document.createElement('button')
+        btn.className = 'btn btn-danger'
+        btn.innerHTML = '<i class="fas fa-times"></i>'
+        btn.id = `id_despesa_${valor.id}`
+        btn.onclick = function() {
+            let id = this.id.replace('id_despesa_', '')
+            bd.remover(id)
+            window.location.reload()
+        }
+        linha.insertCell(4).append(btn)
+        console.log(valor)
     })
 }
+
+function pesquisarDespesa() {
+    let ano = document.getElementById('ano').value
+    let mes = document.getElementById('mes').value
+    let dia = document.getElementById('dia').value
+    let tipo = document.getElementById('tipo').value
+    let descricao = document.getElementById('descricao').value
+    let valor =document.getElementById('valor').value
+    
+    let despesa = new Despesa(ano, mes, dia, tipo, descricao, valor)
+
+    let despesas = bd.pesquisar(despesa)
+
+    carregaListaDespesas(despesas, true)
+}
+
