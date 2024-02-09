@@ -50,25 +50,30 @@ class Bd {
 
             despesas.push(despesa)
         }
-
-        console.log(despesas)
+        return despesas
     }
 }
 
 let bd = new Bd
 
 function cadastrarDespesa() {
-    let ano = document.getElementById('ano').value
-    let mes = document.getElementById('mes').value
-    let dia = document.getElementById('dia').value
-    let tipo = document.getElementById('tipo').value
-    let descricao = document.getElementById('descricao').value
-    let valor =document.getElementById('valor').value
+    let ano = document.getElementById('ano')
+    let mes = document.getElementById('mes')
+    let dia = document.getElementById('dia')
+    let tipo = document.getElementById('tipo')
+    let descricao = document.getElementById('descricao')
+    let valor =document.getElementById('valor')
 
-    let despesa = new Despesa(ano, mes, dia, tipo, descricao, valor)
+    let despesa = new Despesa(ano.value, mes.value, dia.value, tipo.value, descricao.value, valor.value)
 
     if (despesa.validarDados()) {
         bd.gravarDespesa(despesa)
+        ano.value = ''
+        mes.value = ''
+        dia.value = ''
+        tipo.value = ''
+        descricao.value = ''
+        valor.value = ''
         ajustarModal(true)
         $('#modalRegistroDespesa').modal('show')
     } else {
@@ -86,5 +91,40 @@ function ajustarModal(sucesso) {
 }
 
 function carregaListaDespesas() {
-    bd.recuperarTodosRegistros()
+    let despesas = bd.recuperarTodosRegistros()
+    let listaDespesas = document.getElementById('listaDespesas')
+    /*Base
+    <tr>
+        <td>15/03/2018</td>
+        <td>Alimentação</td>
+        <td>Compras do mês</td>
+        <td>R$200,00</td>
+    </tr>*/
+
+    despesas.forEach(function(valor, indice, lista) {
+        console.log(valor)
+        //criando o TR
+        let linha = listaDespesas.insertRow()
+
+        //criar o TD
+        linha.insertCell(0).innerHTML = `${valor.dia}/${valor.mes}/${valor.ano}`
+
+        //Ajustar o tipo
+        switch(valor.tipo) {
+            case '1': valor.tipo = 'Alimentação'
+                break
+            case '2': valor.tipo = 'Educação'
+                break
+            case '3': valor.tipo = 'Lazer'
+                break
+            case '4': valor.tipo = 'Saúde'
+                break
+            case '5': valor.tipo = 'Transporte'
+                break
+        }
+        linha.insertCell(1).innerHTML = valor.tipo
+        linha.insertCell(2).innerHTML = valor.descricao
+        linha.insertCell(3).innerHTML = valor.valor
+        linha.insertCell(4)
+    })
 }
