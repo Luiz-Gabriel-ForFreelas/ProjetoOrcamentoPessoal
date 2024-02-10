@@ -74,6 +74,10 @@ class Bd {
         if(despesa.descricao != '') {
             despesasFiltradas = despesasFiltradas.filter(valor => valor.descricao == despesa.descricao)
         }
+        //tipo
+        if(despesa.tipo != '') {
+            despesasFiltradas = despesasFiltradas.filter(valor => valor.tipo == despesa.tipo)
+        }
         //valor
         if(despesa.valor != '') {
             despesasFiltradas = despesasFiltradas.filter(valor => valor.valor == despesa.valor)
